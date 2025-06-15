@@ -2,6 +2,8 @@ package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.*;
@@ -14,16 +16,17 @@ public class JCFUserService implements UserService {
        return instance;
     }
 
-    private final Map<String, User> users = new HashMap<>();
+    //private final Map<String, User> users = new HashMap<>();
+    private final UserRepository userRepository = JCFUserRepository.getInstance();
 
     @Override
     public void addUser(User user) {
-        users.put(user.getUserId().toString(), user);
+        userRepository.save(user);
     }
 
     @Override
     public List<User> getUsers() {
-        return new ArrayList<>(users.values());
+        return userRepository.findAll();
     }
 
     /**
@@ -33,22 +36,28 @@ public class JCFUserService implements UserService {
      */
     @Override
     public void updateUser(UUID userId, String updatedText) {
-        Optional.ofNullable(users.get(userId.toString()))
+            userRepository.findById(userId)
                 .ifPresent(user -> {
                     user.setUserName(updatedText);
                     user.setUpdatedAt(System.currentTimeMillis());
+                    userRepository.save(user);
                 });
         }
 
 
     @Override
     public void deleteUser(UUID userId) {
-        users.remove(userId.toString());
+        userRepository.deleteById(userId);
     }
 
     @Override
     public User getUserById(UUID userId) {
-        return users.get(userId.toString());
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (optionalUser.isPresent()) {
+            return optionalUser.get();
+        } else {
+            throw new RuntimeException("User not found");
+        }
     }
 
     /**
@@ -59,7 +68,7 @@ public class JCFUserService implements UserService {
     @Override
     public void findUsersByKeyword(String keyword) {
     System.out.println("[" + keyword + "] 키워드로 검색한 결과: ");
-        for (User user : users.values()) {
+        for (User user : userRepository.findAll()) {
             if(user.getUserName().toLowerCase().contains(keyword.toLowerCase())) {
                 System.out.println(user);
             }
@@ -73,12 +82,12 @@ public class JCFUserService implements UserService {
      */
     @Override
     public void updateUserStatus (UUID userId, UserStatus status) {
-        Optional.ofNullable(users.get(userId.toString()))
+        userRepository.findById(userId)
                 .ifPresent(user -> {
                     user.setUserStatus(status);
                     user.setUpdatedAt(System.currentTimeMillis());
+                    userRepository.save(user);
                 });
-
     }
 
     /**
@@ -90,7 +99,7 @@ public class JCFUserService implements UserService {
     @Override
     public List<User> findUsersByStatus(UserStatus status) {
         List<User> result = new ArrayList<>();
-            for (User user : users.values()) {
+            for (User user : userRepository.findAll()) {
                 // 상태가 일치하는 유저만 결과에 추가
                 if(user.getUserStatus().equals(status)){
                     result.add(user);

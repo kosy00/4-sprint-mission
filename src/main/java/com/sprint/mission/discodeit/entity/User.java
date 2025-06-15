@@ -4,7 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class User extends BaseEntity {
+import java.io.Serializable;
+
+
+public class User extends BaseEntity implements Serializable {
+    private static final long serialVersionUID = 1L;
     private UUID userId;
     private String userName;
     private UserStatus userStatus;

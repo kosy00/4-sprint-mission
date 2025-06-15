@@ -7,7 +7,7 @@ public enum UserStatus {
     DELETED("삭제된 유저"),
     BANNED("차단된 유저"),;
 
-    private String userStatus;
+    private final String userStatus;
 
     UserStatus(String userStatus) {
         this.userStatus = userStatus;

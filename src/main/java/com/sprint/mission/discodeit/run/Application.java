@@ -3,11 +3,23 @@ package com.sprint.mission.discodeit.run;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
+import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
+import com.sprint.mission.discodeit.repository.file.FileUserRepository;
+import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.file.FileChannelService;
+import com.sprint.mission.discodeit.service.file.FileMessageService;
+import com.sprint.mission.discodeit.service.file.FileUserService;
 import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static com.sprint.mission.discodeit.entity.UserStatus.ACTIVE;
@@ -15,12 +27,36 @@ import static com.sprint.mission.discodeit.entity.UserStatus.INACTIVE;
 
 public class Application {
     public static void main(String[] args) {
-        JCFUserService userService = JCFUserService.getInstance();
+        UserRepository userRepository = new FileUserRepository();
+        ChannelRepository channelRepository = new FileChannelRepository();
+
+        UserService userService = new FileUserService(new FileUserRepository());
+        ChannelService channelService = new FileChannelService(channelRepository, userRepository);
+        MessageService messageService = new FileMessageService(new FileMessageRepository());
+
+    //저장 테스트
+    User user1 = new User(UUID.randomUUID(), "은서", ACTIVE);
+    User user2 = new User(UUID.randomUUID(), "양말", INACTIVE);
+    userRepository.save(user1);
+    userRepository.save(user2);
+
+    //조회 테스트
+    Optional<User> foundUser = userRepository.findById(user1.getUserId());
+    System.out.println("선택한 유저 조회" + foundUser);
+
+    //전체 조회 테스트
+    List<User> users = userRepository.findAll();
+    System.out.println("전체 유저 조회" + users);
+
+    //삭제 테스트
+    userRepository.deleteById(user1.getUserId());
+    System.out.println("유저가 삭제되었는지 확인합니다." + userRepository.findAll());
+
 
         //1.유저 등록
         UUID userId = UUID.randomUUID();
-        User user1 = new User(UUID.randomUUID(), "문은서", ACTIVE);
-        User user2 = new User(UUID.randomUUID(), "양말", ACTIVE);
+        user1 = new User(UUID.randomUUID(), "문은서", ACTIVE);
+        user2 = new User(UUID.randomUUID(), "양말", ACTIVE);
         userService.addUser(user1);
         userService.addUser(user2);
 
@@ -67,7 +103,7 @@ public class Application {
         }
 
 
-        JCFChannelService channelService = JCFChannelService.getInstance();
+        //JCFChannelService channelService = JCFChannelService.getInstance();
      userService.addUser(user1);
 
     //1. 채널 등록
@@ -114,7 +150,7 @@ public class Application {
     System.out.println("키워드로 채널을 찾습니다.");
     channelService.findChannelByKeyword("추");
 
-    JCFMessageService messageService = JCFMessageService.getInstance();
+    //JCFMessageService messageService = JCFMessageService.getInstance();
     channelService.joinChannel(channel.getChannelId(), user2.getUserId());
 
 
@@ -200,3 +236,4 @@ public class Application {
         }
     }
 }
+

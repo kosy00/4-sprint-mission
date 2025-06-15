@@ -3,7 +3,10 @@ package com.sprint.mission.discodeit.entity;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-public class Message extends BaseEntity {
+import java.io.Serializable;
+
+public class Message extends BaseEntity implements Serializable {
+    private static final long serialVersionUID = 1L;
     private UUID messageId;
     private String messageContent;
     private User sender;
