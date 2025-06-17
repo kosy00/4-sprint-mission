@@ -6,10 +6,7 @@ import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 public class FileMessageService implements MessageService {
     public final MessageRepository messageRepository;
@@ -33,34 +30,28 @@ public class FileMessageService implements MessageService {
 
     @Override
     public void updateMessage(UUID messageId, String replacedContent) {
-        Optional<Message> optionalMessage = messageRepository.findById(messageId);
+        Message message = messageRepository.findById(messageId)
+                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 메세지입니다."));
 
-        if (optionalMessage.isPresent()) {
-            Message message = optionalMessage.get();
             message.setMessageContent(replacedContent);
             message.setUpdatedAt(System.currentTimeMillis());
             messageRepository.save(message);
-        } else {
-            throw new RuntimeException("메세지를 찾을 수 없습니다: " + messageId);
-        }
-
-
     }
 
     @Override
     public void replaceSubstringInContent(UUID messageId, String originalContent, String replacedContent) {
-        Optional<Message> optionalMessage = messageRepository.findById(messageId);
-                if (optionalMessage.isPresent()){
-                    Message message = optionalMessage.get();
-                    String originalMsg = message.getMessageContent();
-                    if (!originalMsg.contains(originalContent)) return;
-                    String replacedMsg = originalMsg.replaceFirst(originalContent, replacedContent);
-                    message.setMessageContent(replacedMsg);
-                    message.setUpdatedAt(System.currentTimeMillis());
-                    messageRepository.save(message);
-                } else {
-                    throw new RuntimeException("메세지를 찾을 수 없습니다: " + messageId);
-                }
+        Message message = messageRepository.findById(messageId)
+                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 메세지입니다."));
+
+        String originalMsg = message.getMessageContent();
+        if (!originalMsg.contains(originalContent)) {
+            System.out.println("대체할 문자열이 존재하지 않습니다.");
+            return;
+        }
+        String replacedMsg = originalMsg.replaceFirst(originalContent, replacedContent);
+        message.setMessageContent(replacedMsg);
+        message.setUpdatedAt(System.currentTimeMillis());
+        messageRepository.save(message);
     }
 
     @Override

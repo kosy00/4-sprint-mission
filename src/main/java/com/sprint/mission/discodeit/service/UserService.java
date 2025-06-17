@@ -12,7 +12,7 @@ import java.util.UUID;
         public void deleteUser(UUID userId);
         public void updateUser(UUID userId, String updatedText );
         public User getUserById(UUID userId);
-        public void findUsersByKeyword(String keyword);
+        public void printUsersByKeyword(String keyword);
         public void updateUserStatus(UUID userId, UserStatus status);
         public List<User> findUsersByStatus(UserStatus status);
     }

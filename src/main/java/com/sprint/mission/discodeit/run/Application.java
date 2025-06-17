@@ -89,7 +89,7 @@ public class Application {
 
         //8. 키워드로 유저 찾기
         System.out.println("키워드로 유저를 찾습니다.");
-        userService.findUsersByKeyword("양");
+        userService.printUsersByKeyword("양");
 
         //9.유저 상태 변경
         System.out.println("유저의 상태를 변경합니다.");
@@ -148,7 +148,7 @@ public class Application {
 
     //10. 키워드로 채널 찾기
     System.out.println("키워드로 채널을 찾습니다.");
-    channelService.findChannelByKeyword("추");
+    channelService.printChannelByKeyword("추");
 
     //JCFMessageService messageService = JCFMessageService.getInstance();
     channelService.joinChannel(channel.getChannelId(), user2.getUserId());

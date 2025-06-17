@@ -83,7 +83,7 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public void findChannelByKeyword(String keyword) {
+    public void printChannelByKeyword(String keyword) {
         System.out.println("[" + keyword + "] 키워드로 검색한 결과: ");
         for (Channel channel : channelRepository.findAll()) {
             if(channel.getChannelName().toLowerCase().contains(keyword)){

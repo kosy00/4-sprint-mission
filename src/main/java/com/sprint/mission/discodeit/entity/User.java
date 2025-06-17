@@ -52,7 +52,7 @@ public class User extends BaseEntity implements Serializable {
 
     public List<Message> getMyMessages() {
         return myMessages;
-        }
+    }
 
     /**
      * 유저를 채널에 추가하고, 채널에도 해당 유저를 동기화하여 추가합니다. (양방향 동기화)*/
@@ -67,8 +67,8 @@ public class User extends BaseEntity implements Serializable {
     public void removeChannel(Channel channel) {
         if (joinedChannels.remove(channel)) {
             channel.removeJoinedUser(this);
-            }
         }
+    }
 
 
     /** 유저가 보낸 메세지를 리스트에 등록하고, 메세지의 작성자도 이 유저로 설정합니다. (양방향 동기화)*/
@@ -97,8 +97,8 @@ public class User extends BaseEntity implements Serializable {
                 ", 참여하는 채널 수:" + joinedChannels.size() +
                 ", 내가 보낸 메세지 수: " + myMessages.size() +
                 "]");
-    }
+        }
 
-}
+    }
 
 

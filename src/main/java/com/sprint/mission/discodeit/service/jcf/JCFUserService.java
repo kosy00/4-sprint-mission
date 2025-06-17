@@ -66,7 +66,7 @@ public class JCFUserService implements UserService {
      * @param keyword 입력된 키워드
      */
     @Override
-    public void findUsersByKeyword(String keyword) {
+    public void printUsersByKeyword(String keyword) {
     System.out.println("[" + keyword + "] 키워드로 검색한 결과: ");
         for (User user : userRepository.findAll()) {
             if(user.getUserName().toLowerCase().contains(keyword.toLowerCase())) {

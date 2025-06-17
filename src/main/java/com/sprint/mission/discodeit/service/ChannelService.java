@@ -12,6 +12,6 @@ public interface ChannelService {
     public void updateChannel(UUID channelId, int selectedNum, String updatedText);
     public void joinChannel(UUID channelId, UUID userId);
     public void leaveChannel(UUID channelId, UUID userId);
-    public void findChannelByKeyword(String keyword);
+    public void printChannelByKeyword(String keyword);
 }
 

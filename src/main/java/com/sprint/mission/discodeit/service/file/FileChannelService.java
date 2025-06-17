@@ -33,6 +33,7 @@ public class FileChannelService implements ChannelService {
     public void updateChannel(UUID channelId, int selectedNum, String updatedText) {
         Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 채널입니다."));
+
             if (selectedNum == 1) {
                 channel.setChannelName(updatedText);
                 channel.setUpdatedAt(System.currentTimeMillis());
@@ -67,7 +68,7 @@ public class FileChannelService implements ChannelService {
     }
 
     @Override
-    public void findChannelByKeyword(String keyword) {
+    public void printChannelByKeyword(String keyword) {
         System.out.println("[" + keyword + "] 키워드로 검색한 결과: ");
         for (Channel channel : channelRepository.findAll()) {
             if(channel.getChannelName().toLowerCase().contains(keyword)){

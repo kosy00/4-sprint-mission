@@ -5,10 +5,7 @@ import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 public class FileUserService implements UserService {
 
@@ -30,15 +27,12 @@ public class FileUserService implements UserService {
 
     @Override
     public void updateUser(UUID userId, String updatedText) {
-        Optional<User> optionalUser = userRepository.findById(userId);
-        if (optionalUser.isPresent()) {
-            User user = optionalUser.get();
-            user.setUserName(updatedText);
-            user.setUpdatedAt(System.currentTimeMillis());
-            userRepository.save(user);
-        } else {
-            throw new RuntimeException("유저를 찾을 수 없습니다: " + userId);
-        }
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 유저입니다."));
+
+        user.setUserName(updatedText);
+        user.setUpdatedAt(System.currentTimeMillis());
+        userRepository.save(user);
     }
 
     @Override
@@ -48,16 +42,12 @@ public class FileUserService implements UserService {
 
     @Override
     public User getUserById(UUID userId) {
-        Optional<User> optionalUser = userRepository.findById(userId);
-        if (optionalUser.isPresent()) {
-            return optionalUser.get();
-        } else {
-            throw new RuntimeException("유저를 찾을 수 없습니다.");
-        }
+        return userRepository.findById(userId)
+            .orElseThrow(() -> new NoSuchElementException("존재하지 않는 유저입니다."));
     }
 
     @Override
-    public void findUsersByKeyword(String keyword) {
+    public void printUsersByKeyword(String keyword) {
         System.out.println("[" + keyword + "] 키워드로 검색한 결과: ");
         for (User user : userRepository.findAll()) {
             if(user.getUserName().toLowerCase().contains(keyword.toLowerCase())) {
@@ -68,12 +58,12 @@ public class FileUserService implements UserService {
 
     @Override
     public void updateUserStatus (UUID userId, UserStatus status) {
-        userRepository.findById(userId)
-                .ifPresent(user -> {
-                    user.setUserStatus(status);
-                    user.setUpdatedAt(System.currentTimeMillis());
-                    userRepository.save(user);
-                });
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 유저입니다."));
+
+        user.setUserStatus(status);
+        user.setUpdatedAt(System.currentTimeMillis());
+        userRepository.save(user);
     }
 
     @Override
