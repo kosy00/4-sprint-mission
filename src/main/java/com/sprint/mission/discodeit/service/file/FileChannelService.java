@@ -54,9 +54,7 @@ public class FileChannelService implements ChannelService {
             channel.addJoinedUser(user);
             channelRepository.save(channel);
         }
-
-    /**유저가 채널에서 퇴장할 수 있도록 채널에서 유저를 삭제합니다.
-     *유효한 채널과 유저인지 먼저 확인*/
+        
     @Override
     public void leaveChannel(UUID channelId, UUID userId) {
           Channel channel = channelRepository.findById(channelId)
