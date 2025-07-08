@@ -31,7 +31,7 @@ public class MessageController {
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<MessageResponseDto> createMessage(@RequestBody MessageCreateDto dto) {
         MessageResponseDto message = messageService.create(dto);
-        return new ResponseEntity<>(message, HttpStatus.CREATED);
+        return new ResponseEntity<>(message, HttpStatus.OK);
     }
 
     @RequestMapping(method = RequestMethod.PUT, value = "/{message-id}")

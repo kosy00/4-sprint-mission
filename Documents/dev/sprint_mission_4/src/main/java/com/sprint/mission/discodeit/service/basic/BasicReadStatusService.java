@@ -56,7 +56,7 @@ public class BasicReadStatusService implements ReadStatusService {
 
     @Override
     public ReadStatusResponseDto update(ReadStatusRequestDto dto) {
-        ReadStatus readStatus = readStatusRepository.findById(dto.getUserId())
+        ReadStatus readStatus = readStatusRepository.findByUserIdAndChannelId(dto.getUserId(), dto.getChannelId())
                 .orElseThrow(() -> new NoSuchElementException("해당 데이터가 존재하지 않습니다."));
 
         readStatus.setReadAt(dto.getReadAt());

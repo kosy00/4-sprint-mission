@@ -11,6 +11,7 @@ import java.util.UUID;
 public interface ReadStatusRepository {
     ReadStatus save(ReadStatus readStatus);
     Optional<ReadStatus> findById(UUID id);
+    Optional<ReadStatus> findByUserIdAndChannelId(UUID userId, UUID channelId);
     List<ReadStatus> findAllByChannelId(UUID channelId);
     List<ReadStatus> findAllByUserId(UUID userId);
     boolean existsById(UUID id);

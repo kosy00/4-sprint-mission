@@ -38,7 +38,7 @@ public class UserController {
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<UserResponseDto> createUser(@ModelAttribute UserCreateDto dto) {
         UserResponseDto user = userService.create(dto);
-        return new ResponseEntity<>(user, HttpStatus.CREATED);
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     @RequestMapping(method = RequestMethod.PATCH, value = "/{user-id}")

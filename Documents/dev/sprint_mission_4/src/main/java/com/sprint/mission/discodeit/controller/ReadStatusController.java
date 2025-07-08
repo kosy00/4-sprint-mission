@@ -31,7 +31,7 @@ public class ReadStatusController {
     @RequestMapping(method = RequestMethod.POST, value = "/channel/{channel-id}/read-status")
     public ResponseEntity<ReadStatusResponseDto> createChannelReadStatus (@PathVariable("channel-id") UUID channelId, @RequestBody ReadStatusCreateDto dto) {
         ReadStatusResponseDto readStatus = readStatusService.create(dto);
-        return new ResponseEntity<>(readStatus, HttpStatus.CREATED);
+        return new ResponseEntity<>(readStatus, HttpStatus.OK);
     }
 
     @RequestMapping(method = RequestMethod.PATCH, value = "/channel/{channel-id}/read-status")

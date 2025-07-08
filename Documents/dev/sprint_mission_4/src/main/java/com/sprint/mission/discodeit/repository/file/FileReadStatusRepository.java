@@ -11,6 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -67,6 +68,31 @@ public class FileReadStatusRepository implements ReadStatusRepository {
             }
         }
         return Optional.ofNullable(readStatusNullable);
+    }
+
+    @Override
+    public Optional<ReadStatus> findByUserIdAndChannelId(UUID userId, UUID channelId) {
+        try {
+            return Files.list(DIRECTORY)
+                    .filter(path -> path.toString().endsWith(EXTENSION))
+                    .map(path -> {
+                        try (
+                                FileInputStream fis = new FileInputStream(path.toFile());
+                                ObjectInputStream ois = new ObjectInputStream(fis)
+                                ) {
+                            return (ReadStatus) ois.readObject();
+                        } catch (ClassNotFoundException | IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .filter(Objects::nonNull)
+                    .filter(readStatus ->
+                            readStatus.getUserId().equals(userId) &&
+                            readStatus.getChannelId().equals(channelId))
+                    .findFirst();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
