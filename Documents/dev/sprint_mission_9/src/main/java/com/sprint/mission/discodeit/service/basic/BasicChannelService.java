@@ -18,6 +18,7 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -37,20 +38,21 @@ public class BasicChannelService implements ChannelService {
   @Transactional
   @Override
   public ChannelDto create(PublicChannelCreateRequest request) {
-    log.debug("채널 생성 시작: {}", request);
+    log.debug("공개 채널 생성 시작: {}", request);
     String name = request.name();
     String description = request.description();
     Channel channel = new Channel(ChannelType.PUBLIC, name, description);
 
     channelRepository.save(channel);
-    log.info("채널 생성 완료: id={}, name={}", channel.getId(), channel.getName());
+    log.info("공개 채널 생성 완료: id={}, name={}", channel.getId(), channel.getName());
     return channelMapper.toDto(channel);
   }
 
+  @PreAuthorize("hasRole('CHANNEL_MANAGER')")
   @Transactional
   @Override
   public ChannelDto create(PrivateChannelCreateRequest request) {
-    log.debug("채널 생성 시작: {}", request);
+    log.debug("비공개 채널 생성 시작: {}", request);
     Channel channel = new Channel(ChannelType.PRIVATE, null, null);
     channelRepository.save(channel);
 
@@ -59,7 +61,7 @@ public class BasicChannelService implements ChannelService {
         .toList();
     readStatusRepository.saveAll(readStatuses);
 
-    log.info("채널 생성 완료: id={}, name={}", channel.getId(), channel.getName());
+    log.info("비공개 채널 생성 완료: id={}, name={}", channel.getId(), channel.getName());
     return channelMapper.toDto(channel);
   }
 
@@ -85,6 +87,7 @@ public class BasicChannelService implements ChannelService {
         .toList();
   }
 
+  @PreAuthorize("hasRole('CHANNEL_MANAGER')")
   @Transactional
   @Override
   public ChannelDto update(UUID channelId, PublicChannelUpdateRequest request) {
@@ -101,6 +104,7 @@ public class BasicChannelService implements ChannelService {
     return channelMapper.toDto(channel);
   }
 
+  @PreAuthorize("hasRole('CHANNEL_MANAGER')")
   @Transactional
   @Override
   public void delete(UUID channelId) {

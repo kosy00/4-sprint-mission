@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.request.UserRoleUpdateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -154,5 +156,15 @@ public class BasicUserService implements UserService {
 
     userRepository.deleteById(userId);
     log.info("사용자 삭제 완료: id={}", userId);
+  }
+
+  @PreAuthorize("hasRole('ADMIN')")
+  @Transactional
+  @Override
+  public UserDto updateUserRole(UserRoleUpdateRequest request) {
+    User user = userRepository.findById(request.id())
+            .orElseThrow(() -> UserNotFoundException.withId(request.id()));
+    user.updateRole(request.role());
+    return userMapper.toDto(user);
   }
 }
