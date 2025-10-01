@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.auth.DiscodeitUserDetails;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
@@ -22,6 +23,8 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.session.SessionInformation;
+import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,6 +41,7 @@ public class BasicUserService implements UserService {
   private final BinaryContentRepository binaryContentRepository;
   private final BinaryContentStorage binaryContentStorage;
   private final PasswordEncoder passwordEncoder;
+  private final SessionRegistry sessionRegistry;
 
   @Transactional
   @Override
@@ -165,6 +169,20 @@ public class BasicUserService implements UserService {
     User user = userRepository.findById(request.id())
             .orElseThrow(() -> UserNotFoundException.withId(request.id()));
     user.updateRole(request.role());
+
+    //권한이 변경된 사용자가 로그인 상태라면 세션을 무효화함
+    sessionRegistry.getAllPrincipals().stream()
+            .filter(principal -> principal instanceof DiscodeitUserDetails)
+            .map(principal -> (DiscodeitUserDetails) principal)
+            .filter(details -> details.getUsername().equals(user.getUsername()))
+            .findFirst()
+            .ifPresent(details -> {
+              List<SessionInformation> sessions = sessionRegistry.getAllSessions(details, false);
+              if (!sessions.isEmpty()) {
+                sessions.forEach(SessionInformation::expireNow);
+                log.info("사용자 권한 변경으로 인해 세션 무효화 완려: username={}", user.getUsername());
+              }
+            });
     return userMapper.toDto(user);
   }
 }
