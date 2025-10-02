@@ -27,6 +27,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -112,6 +113,7 @@ public class BasicMessageService implements MessageService {
 
   @Transactional
   @Override
+  @PreAuthorize("@basicMessageService.isOwner(#messageId, authentication.principal.userDto.id)")
   public MessageDto update(UUID messageId, MessageUpdateRequest request) {
     log.debug("메시지 수정 시작: id={}, request={}", messageId, request);
     Message message = messageRepository.findById(messageId)
@@ -131,5 +133,11 @@ public class BasicMessageService implements MessageService {
     }
     messageRepository.deleteById(messageId);
     log.info("메시지 삭제 완료: id={}", messageId);
+  }
+
+  public boolean isOwner(UUID messageId, UUID userId) {
+    return messageRepository.findById(messageId)
+            .map(message -> message.getAuthor().getId().equals(userId))
+            .orElse(false);
   }
 }

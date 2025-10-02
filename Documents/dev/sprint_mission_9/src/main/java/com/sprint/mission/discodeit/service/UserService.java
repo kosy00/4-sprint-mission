@@ -24,4 +24,6 @@ public interface UserService {
   void delete(UUID userId);
 
   UserDto updateUserRole(UserRoleUpdateRequest request);
+
+  boolean isOnline(String username);
 }

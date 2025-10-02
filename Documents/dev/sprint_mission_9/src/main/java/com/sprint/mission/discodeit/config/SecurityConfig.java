@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.config;
 
 import com.sprint.mission.discodeit.auth.DiscodeitUserDetails;
+import com.sprint.mission.discodeit.auth.DiscodeitUserDetailsService;
 import com.sprint.mission.discodeit.auth.LoginFailureHandler;
 import com.sprint.mission.discodeit.auth.LoginSuccessHandler;
 import lombok.RequiredArgsConstructor;
@@ -33,14 +34,17 @@ import org.springframework.security.web.authentication.logout.HttpStatusReturnin
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
 
+import static org.springframework.security.config.Customizer.withDefaults;
+
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
+    private final DiscodeitUserDetailsService discodeitUserDetailsService;
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http, SessionRegistry sessionRegistry, LoginSuccessHandler loginSuccessHandler, LoginFailureHandler loginFailureHandler) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, SessionRegistry sessionRegistry, LoginSuccessHandler loginSuccessHandler, LoginFailureHandler loginFailureHandler, DiscodeitUserDetailsService discodeitUserDetailsService) throws Exception {
         http
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
@@ -64,6 +68,9 @@ public class SecurityConfig {
                                 "/configuration/**",
                                 "/webjars/**",
                                 "/actuator/**").permitAll()
+                        .requestMatchers("/**").permitAll()
+//                        .requestMatchers("/", "/login", "/signup", "/favicon.ico",
+//                                "/css/**", "/js/**","index-*.css","/index-*.js", "/images/**", "/webjars/**").permitAll()
                         .anyRequest().authenticated()))
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
@@ -72,7 +79,6 @@ public class SecurityConfig {
                             response.setContentType("application/json");
                             response.getWriter().write("{\"message\":\"권한이 없습니다.\"}");
                         }))
-
                 .sessionManagement(management -> management
                         .sessionConcurrency(concurrency -> concurrency
                                 .maximumSessions(1)
@@ -80,20 +86,12 @@ public class SecurityConfig {
                                 .expiredUrl("/session/expired")
                                 .sessionRegistry(sessionRegistry)
                         ))
-        ;
-
+                .rememberMe(remember -> remember
+                        .key("remember-me")
+                        .tokenValiditySeconds(7 * 24 * 60 * 60)
+                        .rememberMeParameter("remember-me")
+                        .userDetailsService(discodeitUserDetailsService));
         return http.build();
-    }
-
-    @Bean
-    public UserDetailsManager userDetailsService() {
-        UserDetails user = User
-                .withDefaultPasswordEncoder()
-                .username("admin@example.com")
-                .password("admin00")
-                .roles("ADMIN")
-                .build();
-        return new InMemoryUserDetailsManager(user);
     }
 
     @Bean
