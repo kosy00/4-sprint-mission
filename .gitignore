@@ -48,6 +48,6 @@ bin/
 ### Github Actions ###
 !.github/
 
-/sprint_mission_*/
-!/sprint_mission_11/
-document/dev/
+#/sprint_mission_*/
+#!/sprint_mission_11/
+#document/dev/
