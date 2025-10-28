@@ -1,11 +1,17 @@
 spring:
   cache:
-    type: caffeine
+    type: redis
     caffeine:
       spec: >
         maximumSize=100,
         expireAfterAccess=600s,
         recordStatus
+    redis:
+      enable-statistics: true
+      data:
+        redis:
+          host: ${REDIS_HOST:localhost}
+          port: ${REDIS_PORT:6379}
   application:
     name: discodeit
   servlet:
@@ -16,7 +22,7 @@ spring:
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: update
     open-in-view: false
     show-sql: true
   profiles:

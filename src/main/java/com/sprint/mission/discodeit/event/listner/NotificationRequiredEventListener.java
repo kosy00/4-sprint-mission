@@ -32,7 +32,7 @@ public class NotificationRequiredEventListener {
     @Async
     @TransactionalEventListener
     public void on(MessageCreatedEvent event) {
-        List<ReadStatus> readStatuses = readStatusRepository.findAllByChannelIdAndNotificationEnabledTrue(event.channelId(), true);
+        List<ReadStatus> readStatuses = readStatusRepository.findAllByChannelIdAndNotificationEnabledTrue(event.channelId());
         User author = userRepository.findById(event.authorId()).orElseThrow(() -> new UserNotFoundException().withId(event.authorId()));
         Channel channel = channelRepository.findById(event.channelId()).orElseThrow(() -> new ChannelNotFoundException().withId(event.channelId()));
         for (ReadStatus readStatus : readStatuses) {
