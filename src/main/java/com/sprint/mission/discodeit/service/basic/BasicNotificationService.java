@@ -43,4 +43,15 @@ public class BasicNotificationService implements NotificationService {
         }
         notificationRepository.delete(notification);
     }
+
+    @Override
+    @CacheEvict(value = "notifications", allEntries = true)
+    public void createNotification(NotificationDto dto) {
+        Notification notification = new Notification(
+                dto.receiverId(),
+                dto.title(),
+                dto.content()
+        );
+        notificationRepository.save(notification);
+    }
 }

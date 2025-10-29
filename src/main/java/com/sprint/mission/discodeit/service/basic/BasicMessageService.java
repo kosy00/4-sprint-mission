@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.event.BinaryContentCreatedEvent;
+import com.sprint.mission.discodeit.event.MessageCreatedEvent;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
@@ -70,6 +71,7 @@ public class BasicMessageService implements MessageService {
           BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
               contentType);
           binaryContentRepository.save(binaryContent);
+          log.info("🎯 이벤트 발행 호출 전");
           eventPublisher.publishEvent(new BinaryContentCreatedEvent(binaryContent.getId(), bytes));
           return binaryContent;
         })
@@ -85,6 +87,9 @@ public class BasicMessageService implements MessageService {
 
     messageRepository.save(message);
     log.info("메시지 생성 완료: id={}, channelId={}", message.getId(), channelId);
+    eventPublisher.publishEvent(
+            new MessageCreatedEvent(message.getId(), channelId, author.getId(), message.getContent())
+    );
     return messageMapper.toDto(message);
   }
 
