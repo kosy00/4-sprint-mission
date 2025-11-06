@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   app:
     image: discodeit:local
@@ -21,6 +19,9 @@ services:
       - AWS_S3_REGION=${AWS_S3_REGION}
       - AWS_S3_BUCKET=${AWS_S3_BUCKET}
       - AWS_S3_PRESIGNED_URL_EXPIRATION=600
+      - DISCODEIT_ADMIN_USERNAME=${DISCODEIT_ADMIN_USERNAME}
+      - DISCODEIT_ADMIN_PASSWORD=${DISCODEIT_ADMIN_PASSWORD}
+      - DISCODEIT_ADMIN_EMAIL=${DISCODEIT_ADMIN_EMAIL}
     depends_on:
       - db
     volumes:
@@ -49,4 +50,4 @@ volumes:
 
 networks:
   discodeit-network:
-    driver: bridge 
+    external: true
