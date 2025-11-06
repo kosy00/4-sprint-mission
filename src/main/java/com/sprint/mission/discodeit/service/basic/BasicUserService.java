@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.service.SseService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.util.List;
@@ -39,6 +40,7 @@ public class BasicUserService implements UserService {
   private final BinaryContentStorage binaryContentStorage;
   private final PasswordEncoder passwordEncoder;
   private final ApplicationEventPublisher eventPublisher;
+  private final SseService sseService;
 
   @Transactional
   @Override
@@ -76,7 +78,10 @@ public class BasicUserService implements UserService {
 
     userRepository.save(user);
     log.info("사용자 생성 완료: id={}, username={}", user.getId(), username);
-    return userMapper.toDto(user);
+    UserDto dto = userMapper.toDto(user);
+    // 사용자 생성 시 SSE 이벤트 전송
+    sseService.broadcast("users.created", dto);
+    return dto;
   }
 
   @Transactional(readOnly = true)
@@ -146,9 +151,12 @@ public class BasicUserService implements UserService {
     String encodedPassword = Optional.ofNullable(newPassword).map(passwordEncoder::encode)
         .orElse(user.getPassword());
     user.update(newUsername, newEmail, encodedPassword, nullableProfile);
-
     log.info("사용자 수정 완료: id={}", userId);
-    return userMapper.toDto(user);
+    UserDto dto = userMapper.toDto(user);
+
+    // 사용자 정보 업데이트 시 SSE이벤트 전송
+    sseService.broadcast("users.updated", dto);
+    return dto;
   }
 
   @PreAuthorize("principal.userDto.id == #userId")
@@ -164,5 +172,8 @@ public class BasicUserService implements UserService {
 
     userRepository.deleteById(userId);
     log.info("사용자 삭제 완료: id={}", userId);
+
+    //사용자 정보 삭제 시 SSE 이벤트 전송
+    sseService.broadcast("users.deleted", userId);
   }
 }

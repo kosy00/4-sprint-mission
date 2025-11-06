@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.mapper.NotificationMapper;
 import com.sprint.mission.discodeit.repository.NotificationRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.NotificationService;
+import com.sprint.mission.discodeit.service.SseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -22,6 +23,7 @@ public class BasicNotificationService implements NotificationService {
     private final NotificationRepository notificationRepository;
     private final UserRepository userRepository;
     private final NotificationMapper notificationMapper;
+    private final SseService sseService;
 
     @Override
     @Cacheable(value = "notifications", key = "#userId")
@@ -53,5 +55,12 @@ public class BasicNotificationService implements NotificationService {
                 dto.content()
         );
         notificationRepository.save(notification);
+
+        // 알림 생성 시 SSE 이벤트 전송
+        sseService.send(
+                List.of(dto.receiverId()), //수신자 ID 묶음
+                "notifications.created",  // 이벤트 이름
+                notificationMapper.toDto(notification)  // 전송 데이터
+        );
     }
 }
